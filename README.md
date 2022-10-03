@@ -1,6 +1,6 @@
 # EventBus
 
-This package provides an event bus implementation using a combination of Go generics and Go channels. Use an EventBus to create a simple and flexible pub/sub system in any project.
+EventBus is a lightweight implementation of a pub/sub system written with Go generics and Go channels. Use an EventBus to create a simple and flexible pub/sub between two systems in any project.
 
 # Usage
 
