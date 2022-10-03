@@ -22,20 +22,20 @@ go func() {
     defer close(ch)
 
     <-cl
-    bus.Unsubscribe(convo.ID, ch)
+    bus.Unsubscribe("channelID", ch)
 }()
 
 // Use the main channel to receive events dispatched by the bus.
 go func() {
     for {
-        msg, ok := <-ch
+        ev, ok := <-ch
         if !ok {
             // the channel was probably closed
             break
         }
 
-        // do something with your message data
-        err := doSomething(msg)
+        // do something with your event data
+        err := doSomething(ev)
         if err != nil {
             // if something goes wrong, signal the closer channel
             cl <- errors.Wrap(err, "channel closed by server")
