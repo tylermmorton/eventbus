@@ -1,6 +1,11 @@
 # EventBus
 
-EventBus is a lightweight implementation of a pub/sub system written with Go generics and Go channels. Use an EventBus to create a simple and flexible pub/sub between two systems in any project.
+EventBus is a lightweight implementation of the pub/sub pattern written with Go generics and Go channels. Use an `EventBus[K,V]` to create a flexible method of communication between two systems in any project. 
+
+TODO:
+- [ ] Docs
+- [ ] Tests
+- [ ] Benchmarks
 
 # Usage
 
