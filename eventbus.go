@@ -72,10 +72,10 @@ func (b *bus[K, V]) Dispatch(id K, val V) {
 // Transformer takes type T1 and converts it to type T2
 type Transformer[T1 any, T2 any] func(T1) (T2, error)
 
-// Pipe creates a 'pipe' between two different EventBus instances using
-// the given Transformer function. Pipe returns the closer channel that
+// PipeTo creates a 'pipe' between two different EventBus instances using
+// the given Transformer function. PipeTo returns the closer channel that
 // can be used to close the connection between the two buses.
-func Pipe[
+func PipeTo[
 	K1 comparable, V1 any, // K1 and V1 are the key and value for the fromBus
 	K2 comparable, V2 any, // K2 and V2 are the key and value for the toBus
 ](
@@ -109,6 +109,48 @@ func Pipe[
 			}
 
 			toBus.Dispatch(toKey, t)
+		}
+	}()
+
+	return cl
+}
+
+// PipeThrough creates a 'pipe' between two different EventBus instances using
+// the same key and the given Transformer function. Pipe returns a closer channel
+// that can be used to close the connection between the two buses.
+func PipeThrough[
+	K comparable,
+	V1 any, V2 any,
+](
+	key K, fromBus EventBus[K, V1], toBus EventBus[K, V2],
+	transformer Transformer[V1, V2],
+) chan error {
+	ch := make(chan V1)
+	cl := make(chan error)
+
+	fromBus.Subscribe(key, ch)
+	go func() {
+		defer close(ch)
+		<-cl
+
+		fromBus.Unsubscribe(key, ch)
+	}()
+
+	go func() {
+		for {
+			p, ok := <-ch
+			if !ok {
+				break
+			}
+
+			t, err := transformer(p)
+			if err != nil {
+				cl <- err
+
+				break
+			}
+
+			toBus.Dispatch(key, t)
 		}
 	}()
 
