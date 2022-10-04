@@ -1,6 +1,6 @@
 # EventBus
 
-This package provides an event bus implementation using a combination of Go generics and Go channels. Use an EventBus to create a simple and flexible pub/sub system in any project.
+EventBus is a lightweight implementation of a pub/sub system written with Go generics and Go channels. Use an EventBus to create a simple and flexible pub/sub between two systems in any project.
 
 # Usage
 
@@ -22,20 +22,20 @@ go func() {
     defer close(ch)
 
     <-cl
-    bus.Unsubscribe(convo.ID, ch)
+    bus.Unsubscribe("channelID", ch)
 }()
 
 // Use the main channel to receive events dispatched by the bus.
 go func() {
     for {
-        msg, ok := <-ch
+        ev, ok := <-ch
         if !ok {
             // the channel was probably closed
             break
         }
 
-        // do something with your message data
-        err := doSomething(msg)
+        // do something with your event data
+        err := doSomething(ev)
         if err != nil {
             // if something goes wrong, signal the closer channel
             cl <- errors.Wrap(err, "channel closed by server")
