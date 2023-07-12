@@ -115,9 +115,9 @@ func PipeTo[
 	return cl
 }
 
-// PipeThrough creates a 'pipe' between two different EventBus instances using
-// the same key and the given Transformer function. Pipe returns a closer channel
-// that can be used to close the connection between the two buses.
+// PipeThrough creates a 'pipe' between two different EventBus instances with the
+// same key type using the given Transformer function. PipeThrough returns a closer
+// channel that can be used to close the connection between the two buses.
 func PipeThrough[
 	K comparable,
 	V1 any, V2 any,
@@ -155,4 +155,28 @@ func PipeThrough[
 	}()
 
 	return cl
+}
+
+func Wrap[T any](from chan T) chan any {
+	to := make(chan any)
+	go func() {
+		var val T
+		for {
+			val = <-from
+			to <- val
+		}
+	}()
+	return to
+}
+
+func Unwrap[T any](from chan any) chan T {
+	to := make(chan T)
+	go func() {
+		var val any
+		for {
+			val = <-from
+			to <- val.(T)
+		}
+	}()
+	return to
 }
